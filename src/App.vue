@@ -1,9 +1,7 @@
 <template>
     <v-app>
-        <v-app-bar app color="primary" dark extended>
-            <v-app-bar-nav-icon
-                @click.stop="drawer = !drawer"
-            ></v-app-bar-nav-icon>
+        <v-app-bar app color="primary" dark v-if="isHome" extended>
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title to="/">{{ appName }}</v-toolbar-title>
 
             <v-spacer></v-spacer>
@@ -24,10 +22,24 @@
                 label="Search"
                 prepend-inner-icon="mdi-magnify"
                 solo-inverted
-            >
-            </v-text-field>
+            ></v-text-field>
         </v-app-bar>
 
+        <v-app-bar app color="primary" dark v-else>
+            <v-btn icon @click.stop="$router.go(-1)">
+                <v-icon>mdi-arrow-left</v-icon>
+            </v-btn>
+            <v-spacer></v-spacer>
+            <v-btn icon to="/about">
+                <v-badge color="orange" overlap>
+                    <template v-slot:badge>
+                        <span>3</span>
+                    </template>
+                    <v-icon>mdi-cart</v-icon>
+                </v-badge>
+            </v-btn>
+        </v-app-bar>
+        
         <v-card>
             <v-navigation-drawer app v-model="drawer">
                 <v-list>
@@ -38,40 +50,36 @@
                         <v-list-item-content>
                             <v-list-item-title>Kanojo</v-list-item-title>
                         </v-list-item-content>
-                    </v-list-item>                   
+                    </v-list-item>
 
                     <div class="pa-2" v-if="guest">
                         <v-btn block color="primary" class="mb-1">
-                            <v-icon left>mdi-lock</v-icon>
-                            Login
+                            <v-icon left>mdi-lock</v-icon>Login
                         </v-btn>
                         <v-btn block color="success">
-                            <v-icon left>mdi-account</v-icon>
-                            Register
+                            <v-icon left>mdi-account</v-icon>Register
                         </v-btn>
                     </div>
 
                     <v-divider></v-divider>
-                    
+
                     <v-list-item
                         v-for="(item, index) in menus"
                         :key="`menu-` + index"
-                        :to="item.route">
+                        :to="item.route"
+                    >
                         <v-list-item-icon>
                             <v-icon left>{{ item.icon }}</v-icon>
                         </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title>
-                                {{ item.title }}
-                            </v-list-item-title>
+                            <v-list-item-title>{{ item.title }}</v-list-item-title>
                         </v-list-item-content>
-                    </v-list-item>                  
+                    </v-list-item>
                 </v-list>
                 <template v-slot:append v-if="!guest">
                     <div class="pa-2">
                         <v-btn block color="red" dark>
-                            <v-icon left>mdi-lock</v-icon>
-                            Logout
+                            <v-icon left>mdi-lock</v-icon>Logout
                         </v-btn>
                     </div>
                 </template>
@@ -103,7 +111,11 @@ export default {
     components: {
         // HelloWorld,
     },
-
+    computed: {
+        isHome() {
+            return (this.$route.path==='/')
+        }
+    },
     data: () => ({
         drawer: false,
         menus: [
