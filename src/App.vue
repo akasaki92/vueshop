@@ -1,6 +1,6 @@
 <template>
     <v-app>
-        <v-app-bar app color="primary" dark v-if="isHome" extended>
+        <v-app-bar app color="primary" dark v-if="isHome" extended flat>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title to="/">{{ appName }}</v-toolbar-title>
 
@@ -25,7 +25,7 @@
             ></v-text-field>
         </v-app-bar>
 
-        <v-app-bar app color="primary" dark v-else>
+        <v-app-bar app color="primary" dark v-else flat>
             <v-btn icon @click.stop="$router.go(-1)">
                 <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
@@ -39,7 +39,7 @@
                 </v-badge>
             </v-btn>
         </v-app-bar>
-        
+
         <v-card>
             <v-navigation-drawer app v-model="drawer">
                 <v-list>
@@ -86,6 +86,8 @@
             </v-navigation-drawer>
         </v-card>
 
+        <alert />
+
         <v-main>
             <v-container fluid>
                 <!-- jika menggunakan vue-router -->
@@ -94,6 +96,7 @@
                 </v-slide-y-transition>
             </v-container>
         </v-main>
+
         <v-card>
             <v-footer absolute app>
                 <v-card-text class="text-center">
@@ -107,22 +110,21 @@
 <script>
 export default {
     name: "App",
-
     components: {
-        // HelloWorld,
+        Alert: () => import(/* webpackChunkName: alert */ "./components/Alert"),
     },
     computed: {
         isHome() {
-            return (this.$route.path==='/')
+            return this.$route.path === "/";
         }
     },
     data: () => ({
         drawer: false,
         menus: [
             { title: "Home", icon: "mdi-home", route: "/" },
-            { title: "About", icon: "mdi-account", route: "/about" },
+            { title: "About", icon: "mdi-account", route: "/about" }
         ],
-        guest: false,
-    }),
+        guest: false
+    })
 };
 </script>
