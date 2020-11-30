@@ -4,9 +4,9 @@
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title to="/">{{ appName }}</v-toolbar-title>
             <v-spacer></v-spacer>
-             <v-btn icon>
-                <v-btn icon dark @click="dialog = true">
-                    <v-icon>mdi-magnify</v-icon> 
+            <v-btn icon>
+                <v-btn icon dark @click="setDialogComponent('search')">
+                    <v-icon>mdi-magnify</v-icon>
                 </v-btn>
             </v-btn>
             <v-btn icon>
@@ -16,7 +16,7 @@
                     </template>
                     <v-icon>mdi-cart</v-icon>
                 </v-badge>
-            </v-btn>      
+            </v-btn>
         </v-app-bar>
 
         <v-app-bar app color="primary" dark v-else flat>
@@ -24,9 +24,9 @@
                 <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
-             <v-btn icon>
-                <v-btn icon dark @click="dialog = true">
-                    <v-icon>mdi-magnify</v-icon> 
+            <v-btn icon>
+                <v-btn icon dark @click="setDialogComponent('search')">
+                    <v-icon>mdi-magnify</v-icon>
                 </v-btn>
             </v-btn>
             <v-btn icon>
@@ -86,10 +86,16 @@
         </v-card>
 
         <alert />
-        <v-dialog v-model="dialog" fullscreen hide-overlay transition="scale-transition">
-            <search @closed="closeDialog" />
-        </v-dialog>
-
+        <keep-alive>
+            <v-dialog
+                v-model="dialog"
+                fullscreen
+                hide-overlay
+                transition="dialog-bottom-transition"
+            >
+                <component :is="currentComponent" @closed="setDialogStatus"></component>
+            </v-dialog>
+        </keep-alive>
         <v-main>
             <v-container fluid>
                 <!-- jika menggunakan vue-router -->
@@ -110,7 +116,7 @@
     </v-app>
 </template>
 <script>
-import { mapGetters } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 export default {
     name: "App",
     components: {
@@ -118,26 +124,37 @@ export default {
         Search: () => import(/* webpackChunkName: search */ "./components/Search")
     },
     data: () => ({
-        drawer: false,
-        dialog: false,
+        drawer: false,        
         menus: [
             { title: "Home", icon: "mdi-home", route: "/" },
             { title: "About", icon: "mdi-account", route: "/about" }
-        ],
-        guest: false
+        ],        
     }),
     methods: {
-        closeDialog(value) {
-            this.dialog = value
-        }
+        ...mapActions({
+            setDialogStatus: 'dialog/setStatus',
+            setDialogComponent: 'dialog/setComponent'
+        })        
     },
     computed: {
         isHome() {
-            return this.$route.path === "/";
+            return (this.$route.path === "/")
         },
         ...mapGetters({
-            countCart: "cart/count"
-        })
+            countCart: "cart/count",
+            guest: "auth/guest",
+            user: "auth/user",
+            dialogStatus: "dialog/status",
+            currentComponent: "dialog/component",
+        }),
+        dialog:{
+            get() {
+                return this.dialogStatus
+            },
+            set (value) {
+                this.setDialogStatus(value)
+            }
+        }
     }
 };
 </script>
