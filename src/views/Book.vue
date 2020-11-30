@@ -59,7 +59,7 @@
             </v-card-text>
 
             <v-card-actions>
-                <v-btn color="success" @click="buy" :disabled="book.stock==0">
+                <v-btn color="success" @click="buy" block :disabled="book.stock==0">
                     <v-icon>mdi-cart-plus</v-icon>&nbsp; BUY
                 </v-btn>
             </v-card-actions>
@@ -93,12 +93,18 @@ export default {
                 })
         },
         ...mapActions({
-            addCart: 'cart/add'
+            addCart: 'cart/add',
+            setAlert: 'alert/set',
         }),
         buy() {
             // jika tanpa mapAction 
             // this.$store.dispatch('cart/add', this.book)
             this.addCart(this.book)
+            this.setAlert({
+                status: true,
+                color: 'success',
+                text: 'Added to cart',
+            })
         }
     }
 }

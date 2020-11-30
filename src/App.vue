@@ -3,13 +3,11 @@
         <v-app-bar app color="primary" dark v-if="isHome" extended flat>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title to="/">{{ appName }}</v-toolbar-title>
-
             <v-spacer></v-spacer>
-
             <v-btn icon>
-                <v-badge color="orange" overlap>
-                    <template v-slot:badge>
-                        <span>3</span>
+                <v-badge :value="countCart" color="orange" overlap>
+                    <template v-slot:badge v-if="countCart>0">
+                        <span>{{ countCart }}</span>
                     </template>
                     <v-icon>mdi-cart</v-icon>
                 </v-badge>
@@ -30,10 +28,10 @@
                 <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
-            <v-btn icon to="/about">
-                <v-badge color="orange" overlap>
-                    <template v-slot:badge>
-                        <span>3</span>
+            <v-btn icon>
+               <v-badge :value="countCart" color="orange" overlap>
+                    <template v-slot:badge v-if="countCart>0">
+                        <span>{{ countCart }}</span>
                     </template>
                     <v-icon>mdi-cart</v-icon>
                 </v-badge>
@@ -108,15 +106,11 @@
     </v-app>
 </template>
 <script>
+import { mapGetters } from "vuex";
 export default {
     name: "App",
     components: {
-        Alert: () => import(/* webpackChunkName: alert */ "./components/Alert"),
-    },
-    computed: {
-        isHome() {
-            return this.$route.path === "/";
-        }
+        Alert: () => import(/* webpackChunkName: alert */ "./components/Alert")
     },
     data: () => ({
         drawer: false,
@@ -125,6 +119,14 @@ export default {
             { title: "About", icon: "mdi-account", route: "/about" }
         ],
         guest: false
-    })
+    }),
+    computed: {
+        isHome() {
+            return this.$route.path === "/";
+        },
+        ...mapGetters({
+            countCart: "cart/count"
+        })
+    }
 };
 </script>
