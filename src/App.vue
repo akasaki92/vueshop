@@ -1,9 +1,14 @@
 <template>
     <v-app>
-        <v-app-bar app color="primary" dark v-if="isHome" extended flat>
+        <v-app-bar app color="primary" dark v-if="isHome" flat>
             <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
             <v-toolbar-title to="/">{{ appName }}</v-toolbar-title>
             <v-spacer></v-spacer>
+             <v-btn icon>
+                <v-btn icon dark @click="dialog = true">
+                    <v-icon>mdi-magnify</v-icon> 
+                </v-btn>
+            </v-btn>
             <v-btn icon>
                 <v-badge :value="countCart" color="orange" overlap>
                     <template v-slot:badge v-if="countCart>0">
@@ -11,16 +16,7 @@
                     </template>
                     <v-icon>mdi-cart</v-icon>
                 </v-badge>
-            </v-btn>
-
-            <v-text-field
-                slot="extension"
-                hide-details
-                flat
-                label="Search"
-                prepend-inner-icon="mdi-magnify"
-                solo-inverted
-            ></v-text-field>
+            </v-btn>      
         </v-app-bar>
 
         <v-app-bar app color="primary" dark v-else flat>
@@ -28,8 +24,13 @@
                 <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
             <v-spacer></v-spacer>
+             <v-btn icon>
+                <v-btn icon dark @click="dialog = true">
+                    <v-icon>mdi-magnify</v-icon> 
+                </v-btn>
+            </v-btn>
             <v-btn icon>
-               <v-badge :value="countCart" color="orange" overlap>
+                <v-badge :value="countCart" color="orange" overlap>
                     <template v-slot:badge v-if="countCart>0">
                         <span>{{ countCart }}</span>
                     </template>
@@ -85,6 +86,9 @@
         </v-card>
 
         <alert />
+        <v-dialog v-model="dialog" fullscreen hide-overlay transition="scale-transition">
+            <search @closed="closeDialog" />
+        </v-dialog>
 
         <v-main>
             <v-container fluid>
@@ -110,16 +114,23 @@ import { mapGetters } from "vuex";
 export default {
     name: "App",
     components: {
-        Alert: () => import(/* webpackChunkName: alert */ "./components/Alert")
+        Alert: () => import(/* webpackChunkName: alert */ "./components/Alert"),
+        Search: () => import(/* webpackChunkName: search */ "./components/Search")
     },
     data: () => ({
         drawer: false,
+        dialog: false,
         menus: [
             { title: "Home", icon: "mdi-home", route: "/" },
             { title: "About", icon: "mdi-account", route: "/about" }
         ],
         guest: false
     }),
+    methods: {
+        closeDialog(value) {
+            this.dialog = value
+        }
+    },
     computed: {
         isHome() {
             return this.$route.path === "/";

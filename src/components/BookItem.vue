@@ -18,11 +18,11 @@
 
 <script>
 export default {
-	name: 'book-item',
-	props: ['book'],
-	data: () => ({
+    name: 'book-item',
+    props: ['book'],
+    data: () => ({
 
-	})
+    })
 }
 </script>
 
