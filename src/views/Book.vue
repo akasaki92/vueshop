@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 export default {
     data:() => ({
         book: {},
@@ -91,8 +92,13 @@ export default {
                     console.log(responses)
                 })
         },
+        ...mapActions({
+            addCart: 'cart/add'
+        }),
         buy() {
-            alert('buy')
+            // jika tanpa mapAction 
+            // this.$store.dispatch('cart/add', this.book)
+            this.addCart(this.book)
         }
     }
 }
