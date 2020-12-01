@@ -15,6 +15,7 @@
                     :rules="emailRules"
                     label="E-mail"
                     required
+                    autofocus
                     append-icon="mdi-email"
                 ></v-text-field>
                 <v-text-field
@@ -28,9 +29,9 @@
                     @click:append="showPassword = !showPassword"
                 ></v-text-field>
                 <div class="text-xs-cener">
-                    <v-btn color="accent lighten-1" :disabled="!valid" @click="submit">
+                    <v-btn block color="primary" :disabled="!valid" @click="submit">
                         Login
-                        <v-icon>mdi-lock-open</v-icon>
+                        
                     </v-btn>
                 </div>
             </v-form>
@@ -45,7 +46,7 @@ export default {
     data() {
         return {
             valid: true,
-            email: "lou56@example.org",
+            email: "wbrown@example.com",
             emailRules: [
                 v => !!v || "E-mail is required",
                 v =>
@@ -54,7 +55,7 @@ export default {
                     ) || "E-mail must be valid"
             ],
             showPassword: false,
-            password: "",
+            password: "123456",
             passwordRules: [
                 v => !!v || "Password is requiered",
                 v => (v && v.length >= 6) || "Min 6 Characteres"
@@ -63,32 +64,33 @@ export default {
     },
     computed: {
         ...mapGetters({
-            user: "auth/user"
-        })
-    },
+            user: "auth/user",   
+            prevUrl: "prevUrl",         
+        }),
+    },    
     methods: {
         ...mapActions({
             setAlert: "alert/set",
-            setAuth: "auth/set"
+            setAuth: "auth/set",
         }),
         submit() {
-            if (this.$ref.form.validate()) {
+            if (this.$refs.form.validate()) {
                 let formData = {
                     email: this.email,
                     password: this.password
                 };
-                this.axios
-                    .post("/login", formData)
-                    .then(response => {
+                this.axios.post("/login", formData)
+                    .then((response) => {
                         let { data } = response.data;
-                        this.setAuth(data);
+                        this.setAuth(data)
                         if (this.user.id > 0) {
                             this.setAlert({
                                 status: true,
                                 color: "success",
                                 text: "Login Success"
                             });
-                            this.close();
+                            if(this.prevUrl.length>0) this.$router.push(this.prevUrl)
+                            this.close()
                         } else {
                             this.setAlert({
                                 status: true,
@@ -97,13 +99,14 @@ export default {
                             });
                         }
                     })
-                    .catch(error => {
-                        let responses = error.response;
+                    .catch((error) => {
+                        let {data} = error.response;
                         this.setAlert({
                             status: true,
                             color: "error",
-                            text: responses.data.message
+                            text: data.message
                         });
+                        
                     });
             }
         },

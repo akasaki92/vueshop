@@ -3,7 +3,7 @@ export default ({
     state: {
         user: {},
     },
-    mutation: {
+    mutations: {
         set: (state, payload) => {
             state.user = payload
         },
