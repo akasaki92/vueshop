@@ -29,6 +29,10 @@ export default ({
                 // menghapus item carts jika qty nol
                 state.carts.splice(idx, 1)
             }
+        },
+        // batch update carts
+        set: (state, payload) => {
+            state.carts = payload
         }
     },
     actions: {
@@ -42,6 +46,17 @@ export default ({
                 cartItem.quantity++
                 commit('update', cartItem)
             }
+        },
+        // menghapus cart pada
+        remove: ({ state, commit }, payload) => {
+            let cartItem = state.carts.find(item => item.id === payload.id)
+            if (cartItem) {
+                cartItem.quantity--
+                commit('update', cartItem)
+            }
+        },
+        set: ({ commit }, payload) => {
+            commit('set', payload)
         }
     },
     getters: {
@@ -49,6 +64,27 @@ export default ({
         count: (state) => {
             return state.carts.length
         },
+        totalPrice: (state) => {
+            let total = 0
+            state.carts.forEach(function (cart) {
+                total += cart.price * cart.quantity
+            })
+            return total
+        },
+        totalQuantity: (state) => {
+            let total = 0
+            state.carts.forEach(function (cart) {
+                total += cart.quantity
+            })
+            return total
+        },
+        totalWeight: (state) => {
+            let total = 0
+            state.carts.forEach(function(cart) {
+                total += cart.weight
+            })
+            return total
+        }
     },
     modules: {
     }

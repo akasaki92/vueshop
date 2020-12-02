@@ -9,7 +9,7 @@
                     <v-icon>mdi-magnify</v-icon>
                 </v-btn>
             </v-btn>
-            <v-btn icon>
+            <v-btn icon @click="setDialogComponent('cart')">
                 <v-badge :value="countCart" color="orange" overlap>
                     <template v-slot:badge v-if="countCart>0">
                         <span>{{ countCart }}</span>
@@ -29,7 +29,7 @@
                     <v-icon>mdi-magnify</v-icon>
                 </v-btn>
             </v-btn>
-            <v-btn icon>
+            <v-btn icon @click="setDialogComponent('cart')">
                 <v-badge :value="countCart" color="orange" overlap>
                     <template v-slot:badge v-if="countCart>0">
                         <span>{{ countCart }}</span>
@@ -123,7 +123,8 @@ export default {
         Alert: () => import(/* webpackChunkName: alert */ "./components/Alert"),
         Search: () => import(/* webpackChunkName: search */ "./components/Search"),
         Login: () => import(/* webpackChunkName: login */ "./components/Login"),
-        Register: () => import(/* webpackChunkName: register */ "./components/Register")
+        Register: () => import(/* webpackChunkName: register */ "./components/Register"),
+        Cart: () => import(/* webpackChunkName: cart */ "./components/Cart")
     },
     data: () => ({
         drawer: false,        
