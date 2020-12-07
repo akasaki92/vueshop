@@ -4,20 +4,40 @@ import cart from './cart'
 import alert from './alert'
 import auth from './auth'
 import dialog from './dialog'
+import region from './region'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-    state: {        
+    state: {
+        prevUrl: '',
+        payment:[]        
     },
-    mutations: {       
+    mutations: {    
+        setPrevUrl: (state, value) => {
+            state.prevUrl = value
+        },
+        setPayment: (state, value) => {
+            state.payment = value
+        }   
     },
-    getters: {        
+    actions: {
+        setPrevUrl: ({commit}, value) => {
+            commit('setPrevUrl', value)
+        },
+        setPayment: ({commit}, value) => {
+            commit('setPayment', value)
+        }
+    },
+    getters: {   
+        prevUrl: state => state.prevUrl,
+        payment: state => state.payment,
     },
     modules: {
         cart,
         alert,
         auth,
         dialog,
+        region
     }
 })

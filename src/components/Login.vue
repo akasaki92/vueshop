@@ -4,7 +4,7 @@
             <v-btn icon dark @click.native="close">
                 <v-icon>mdi-close</v-icon>
             </v-btn>
-            <v-toolbar-title>Login and Start Shopping!</v-toolbar-title>
+            <v-toolbar-title>Login</v-toolbar-title>
         </v-toolbar>
         <v-divider></v-divider>
 

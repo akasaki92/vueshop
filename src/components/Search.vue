@@ -9,7 +9,6 @@
 				flat
 				autofocus
 				label="Search"
-				prepend-icon="mdi-magnify"
 				v-model="keyword"
 				@input="doSearch"				
 			></v-text-field>
