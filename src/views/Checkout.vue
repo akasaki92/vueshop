@@ -84,6 +84,80 @@
                 </v-container>
             </v-card>
         </div>
+        <v-subheader>Courier</v-subheader>
+        <div>
+            <v-card flat>
+                <v-container>
+                    <v-select
+                        v-model="courier"
+                        :items="couriers"
+                        @change="getServices"
+                        item-text="text"
+                        item-value="id"
+                        label="Courier"
+                        persistent-hint
+                        single-line
+                    ></v-select>
+                    <v-select
+                        v-model="service"
+                        v-if="courier"
+                        :items="services"
+                        @change="calculateBill"
+                        item-text="resume"
+                        item-value="service"
+                        label="Courier Service"
+                        persistent-hint
+                        single-line
+                    ></v-select>
+
+                    <v-card-actions>
+                        Subtotal
+                        <v-spacer></v-spacer>
+                        Rp. {{ shippingCost.toLocaleString('id-ID') }}
+                    </v-card-actions>
+                </v-container>
+            </v-card>
+        </div>
+
+        <v-subheader>Total</v-subheader>
+        <v-card>
+            <v-container>
+                <v-layout row wrap>
+                    <v-flex xs6 text-xs-center>
+                        Total Bill ({{ totalQuantity }} items)
+                        <div class="title">{{ totalBill.toLocaleString('id-ID') }}</div>
+                    </v-flex>
+                    <v-flex xs6 text-center>
+                        <v-btn block color="success" @click="dialogConfirm=true" :disabled="totalBill==0">
+                            <v-icon light>mdi-cash</v-icon>&nbsp;
+                            Pay
+                        </v-btn>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+        </v-card>
+
+        <template>
+            <v-layout row justify-center>
+                <v-dialog
+                    v-model="dialogConfirm"
+                    scrollable
+                    persistent 
+                    max-width="290px"
+                    transition="dialog-transition"
+                >
+                    <v-card>
+                        <v-card-title primary-title class="headline">Confirmation!</v-card-title>
+                        <v-card-text>If You continue, transaction will be processed</v-card-text>
+                        <v-card-actions>
+                            <v-btn color="warning" @click="cancel">Cancel</v-btn>
+                            <v-spacer></v-spacer>
+                            <v-btn color="success" @click="pay">Continue</v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+            </v-layout>
+        </template>
 	</div>
 </template>
 
@@ -95,8 +169,15 @@ export default {
             name: '',
             address: '',
             phone: '',
-            province_id: 0,
-            city_id: 0
+            province_id: 10,
+            city_id: 0,
+            courier: '',
+            couriers: [],
+            service: '',
+            services: [],
+            shippingCost: 0,
+            totalBill: 0,
+            dialogConfirm: false
         }
     },
     computed: {
@@ -122,7 +203,9 @@ export default {
             setAlert: 'alert/set',
             setAuth: 'auth/set',
             setProvinces: 'region/setProvinces',
-            setCities: 'region/setCities'
+            setCities: 'region/setCities',
+            setCart: 'cart/set',
+            setPayment: 'setPayment'
         }),
         saveShipping() {
             let formData = new FormData()
@@ -155,6 +238,89 @@ export default {
                         color: 'error'
                     })
                 })
+        },
+        getServices(){
+            let courier = this.courier
+            let encodedCart = JSON.stringify(this.carts)
+            console.log(encodedCart)
+            let formData = new FormData()
+            formData.set('courier', courier)
+            formData.set('carts', encodedCart)
+
+            let config = {
+                headers: {
+                    'Authorization': 'Bearer ' + this.user.api_token
+                }
+            }
+            this.axios.post('/services', formData, config)
+                .then((response) => {
+                    let response_data = response.data
+                    if(response_data.status!='error'){
+                        this.services = response_data.data.services
+                        this.setCart(response_data.data.safe_carts)
+                    }
+                    this.setAlert({
+                        status: true,
+                        text: response_data.message,
+                        color: response_data.status
+                    })
+                })
+                .catch((error) => {
+                    let responses = error.response
+                    this.setAlert({
+                        status: true,
+                        text: responses.data.message,
+                        color: 'error'
+                    })
+                })
+        },
+        calculateBill() {
+            let selectedService = this.services.find((service) => {
+                return (service.service == this.service)
+            })
+            this.shippingCost = selectedService.cost
+            this.totalBill = parseInt(this.totalPrice) + parseInt(this.shippingCost)
+        },
+        pay() {
+            this.dialogConfirm = false
+            let courier = this.courier
+            let service = this.service
+            let safeCart = JSON.stringify(this.carts)
+            let formData = new FormData()
+            formData.set('courier', courier)
+            formData.set('service', service)
+            formData.set('carts', safeCart)
+            let config = {
+                headers: {
+                    'Authorization': 'Bearer ' + this.user.api_token,
+                }
+            }
+            this.axios.post('/payment', formData, config)
+                .then((response) => {
+                    let { data } = response
+                    if(data && data.status == 'success') {
+                        this.setPayment(data.data)
+                        this.$router.push({path: "/payment"})
+                        this.setCart([])
+                    }
+
+                    this.setAlert({
+                        status: 'true',
+                        text: data.message,
+                        color: data.status,
+                    })
+                })
+                .catch((error) => {
+                    let {data} = error.response
+                    this.setAlert({
+                        status: true,
+                        text: data.message,
+                        color: 'error'
+                    })
+                })
+        },
+        cancel(){
+            this.dialogConfirm = false
         }
     },
     created() {
@@ -175,6 +341,12 @@ export default {
                     let { data } = response.data
                     this.setCities(data)
                 })	
+        }
+        if(this.couriers.length == 0) {
+            this.axios.get('/couriers')
+                .then((response) => {
+                    this.couriers = response.data.data
+                })
         }
     }
 }
