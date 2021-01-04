@@ -13,6 +13,9 @@
                                 >Rp. {{ item.total_bill.toLocaleString('id-ID') }}</div>
                                 <small>date: {{ item.updated_at }}. courrier: {{ item.courrier_service }}</small>
                             </td>
+                            <td>
+                                {{ item.status }}
+                            </td>
                         </tr>
                     </tbody>
                 </v-simple-table>
