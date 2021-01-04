@@ -135,6 +135,7 @@ export default {
         menus: [
             { title: "Home", icon: "mdi-home", route: "/" },
             { title: "Profile", icon: "mdi-account", route: '/profile', auth: true},
+            { title: "My Order", icon: "mdi-shopping", route: '/my-order', auth: true},
             { title: "About", icon: "mdi-help", route: "/about" },
         ],        
     }),
